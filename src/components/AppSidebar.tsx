@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { BarChart3, Calendar, Brain, CheckSquare, Plus, Settings, User, Database } from 'lucide-react';
+import { BarChart3, Calendar, Brain, CheckSquare, Plus, Settings, Database } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import {
   Sidebar,
@@ -9,8 +9,10 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarFooter,
   useSidebar,
 } from '@/components/ui/sidebar';
+import { UserProfile } from '@/components/UserProfile';
 
 const navigationItems = [
   { icon: BarChart3, label: 'Analytics', isActive: true },
@@ -73,6 +75,10 @@ export function AppSidebar() {
           </SidebarMenuItem>
         </div>
       </SidebarContent>
+
+      <SidebarFooter className="p-2 border-t border-gray-800">
+        <UserProfile />
+      </SidebarFooter>
     </Sidebar>
   );
 }
