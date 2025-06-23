@@ -22,6 +22,15 @@ interface Task {
   category: string;
 }
 
+interface NewTask {
+  title: string;
+  description: string;
+  priority: 'low' | 'medium' | 'high';
+  dueDate: string;
+  estimatedTime: string;
+  category: string;
+}
+
 const TaskManager = () => {
   const [tasks, setTasks] = useState<Task[]>([
     {
@@ -59,10 +68,10 @@ const TaskManager = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [newTask, setNewTask] = useState({
+  const [newTask, setNewTask] = useState<NewTask>({
     title: '',
     description: '',
-    priority: 'medium' as const,
+    priority: 'medium',
     dueDate: '',
     estimatedTime: '',
     category: ''
