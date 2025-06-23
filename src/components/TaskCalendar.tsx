@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -155,29 +154,6 @@ const TaskCalendar = () => {
     hasHighPriority: (date: Date) => getDateTasks(date).some(task => task.priority === 'high')
   };
 
-  const modifiersStyles = {
-    hasTask: { 
-      position: 'relative',
-      '&::after': {
-        content: '""',
-        position: 'absolute',
-        bottom: '2px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        width: '4px',
-        height: '4px',
-        borderRadius: '50%',
-        backgroundColor: '#60a5fa'
-      }
-    },
-    hasHighPriority: {
-      position: 'relative',
-      '&::after': {
-        backgroundColor: '#f87171'
-      }
-    }
-  };
-
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Calendar */}
@@ -194,7 +170,6 @@ const TaskCalendar = () => {
             selected={selectedDate}
             onSelect={setSelectedDate}
             modifiers={modifiers}
-            modifiersStyles={modifiersStyles}
             className="rounded-md border-slate-700 bg-slate-700/30 text-white [&_button]:text-white [&_button:hover]:bg-slate-600 [&_.rdp-day_selected]:bg-blue-600 [&_.rdp-day_selected]:text-white"
           />
         </CardContent>
