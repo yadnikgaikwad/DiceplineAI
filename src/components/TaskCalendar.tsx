@@ -5,8 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { CalendarIcon, Plus, Clock, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
+import { useToast } from '@/hooks/use-toast';
 
 interface Task {
   id: string;
@@ -15,20 +20,38 @@ interface Task {
   priority: 'low' | 'medium' | 'high';
   status: 'pending' | 'in-progress' | 'completed';
   estimatedTime: string;
+  description?: string;
+}
+
+interface NewTask {
+  title: string;
+  description: string;
+  priority: 'low' | 'medium' | 'high';
+  estimatedTime: string;
 }
 
 const TaskCalendar = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [newTask, setNewTask] = useState<NewTask>({
+    title: '',
+    description: '',
+    priority: 'medium',
+    estimatedTime: ''
+  });
+  
+  const { toast } = useToast();
   
   // Mock tasks data
-  const [tasks] = useState<Task[]>([
+  const [tasks, setTasks] = useState<Task[]>([
     {
       id: '1',
       title: 'Review project proposal',
       date: new Date(),
       priority: 'high',
       status: 'pending',
-      estimatedTime: '2 hours'
+      estimatedTime: '2 hours',
+      description: 'Review the latest project proposal and provide feedback'
     },
     {
       id: '2',
@@ -36,7 +59,8 @@ const TaskCalendar = () => {
       date: new Date(),
       priority: 'medium',
       status: 'completed',
-      estimatedTime: '30 minutes'
+      estimatedTime: '30 minutes',
+      description: 'Daily team standup meeting'
     },
     {
       id: '3',
@@ -44,7 +68,8 @@ const TaskCalendar = () => {
       date: new Date(Date.now() + 86400000), // Tomorrow
       priority: 'low',
       status: 'pending',
-      estimatedTime: '1 hour'
+      estimatedTime: '1 hour',
+      description: 'Update project documentation'
     },
     {
       id: '4',
@@ -52,7 +77,8 @@ const TaskCalendar = () => {
       date: new Date(Date.now() + 172800000), // Day after tomorrow
       priority: 'high',
       status: 'in-progress',
-      estimatedTime: '3 hours'
+      estimatedTime: '3 hours',
+      description: 'Prepare presentation for client meeting'
     }
   ]);
 
@@ -64,33 +90,92 @@ const TaskCalendar = () => {
 
   const selectedDateTasks = selectedDate ? getTasksForDate(selectedDate) : [];
 
-  const getDayTasks = (date: Date) => {
+  const handleCreateTask = () => {
+    if (!newTask.title.trim()) {
+      toast({
+        title: "Title required",
+        description: "Please enter a task title.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!selectedDate) {
+      toast({
+        title: "Date required",
+        description: "Please select a date for the task.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const task: Task = {
+      id: Date.now().toString(),
+      title: newTask.title,
+      description: newTask.description,
+      date: selectedDate,
+      priority: newTask.priority,
+      status: 'pending',
+      estimatedTime: newTask.estimatedTime
+    };
+
+    setTasks(prev => [...prev, task]);
+    setNewTask({
+      title: '',
+      description: '',
+      priority: 'medium',
+      estimatedTime: ''
+    });
+    setIsCreateDialogOpen(false);
+    
+    toast({
+      title: "Task created",
+      description: "New task has been added successfully."
+    });
+  };
+
+  const updateTaskStatus = (taskId: string, newStatus: 'pending' | 'in-progress' | 'completed') => {
+    setTasks(prev => prev.map(task => 
+      task.id === taskId ? { ...task, status: newStatus } : task
+    ));
+    
+    toast({
+      title: "Task updated",
+      description: "Task status has been updated."
+    });
+  };
+
+  // Check if a date has tasks for styling
+  const getDateTasks = (date: Date) => {
     return getTasksForDate(date);
   };
 
-  // Custom day content to show task indicators
-  const renderDay = (date: Date) => {
-    const dayTasks = getDayTasks(date);
-    const hasHighPriority = dayTasks.some(task => task.priority === 'high');
-    const taskCount = dayTasks.length;
+  const modifiers = {
+    hasTask: (date: Date) => getDateTasks(date).length > 0,
+    hasHighPriority: (date: Date) => getDateTasks(date).some(task => task.priority === 'high')
+  };
 
-    return (
-      <div className="relative w-full h-full flex items-center justify-center">
-        <span>{date.getDate()}</span>
-        {taskCount > 0 && (
-          <div className="absolute -top-1 -right-1">
-            <div className={`w-2 h-2 rounded-full ${
-              hasHighPriority ? 'bg-red-400' : 'bg-blue-400'
-            }`} />
-          </div>
-        )}
-        {taskCount > 1 && (
-          <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2">
-            <span className="text-xs text-slate-400">{taskCount}</span>
-          </div>
-        )}
-      </div>
-    );
+  const modifiersStyles = {
+    hasTask: { 
+      position: 'relative',
+      '&::after': {
+        content: '""',
+        position: 'absolute',
+        bottom: '2px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: '4px',
+        height: '4px',
+        borderRadius: '50%',
+        backgroundColor: '#60a5fa'
+      }
+    },
+    hasHighPriority: {
+      position: 'relative',
+      '&::after': {
+        backgroundColor: '#f87171'
+      }
+    }
   };
 
   return (
@@ -108,10 +193,9 @@ const TaskCalendar = () => {
             mode="single"
             selected={selectedDate}
             onSelect={setSelectedDate}
-            className="rounded-md border-slate-700 bg-slate-700/30 text-white [&_button]:text-white [&_button:hover]:bg-slate-600 [&_.rdp-day_selected]:bg-blue-600 [&_.rdp-day_selected]:text-white pointer-events-auto"
-            components={{
-              DayContent: ({ date }) => renderDay(date)
-            }}
+            modifiers={modifiers}
+            modifiersStyles={modifiersStyles}
+            className="rounded-md border-slate-700 bg-slate-700/30 text-white [&_button]:text-white [&_button:hover]:bg-slate-600 [&_.rdp-day_selected]:bg-blue-600 [&_.rdp-day_selected]:text-white"
           />
         </CardContent>
       </Card>
@@ -123,21 +207,86 @@ const TaskCalendar = () => {
             <CardTitle className="text-white">
               {selectedDate ? format(selectedDate, 'MMM dd, yyyy') : 'Select a date'}
             </CardTitle>
-            <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-              <Plus className="h-4 w-4 mr-1" />
-              Add Task
-            </Button>
+            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add Task
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-slate-800 border-slate-700 text-white">
+                <DialogHeader>
+                  <DialogTitle>Create New Task</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm text-slate-300 mb-2 block">Title *</label>
+                    <Input
+                      value={newTask.title}
+                      onChange={(e) => setNewTask(prev => ({ ...prev, title: e.target.value }))}
+                      placeholder="Enter task title..."
+                      className="bg-slate-700/50 border-slate-600 text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm text-slate-300 mb-2 block">Description</label>
+                    <Textarea
+                      value={newTask.description}
+                      onChange={(e) => setNewTask(prev => ({ ...prev, description: e.target.value }))}
+                      placeholder="Enter task description..."
+                      className="bg-slate-700/50 border-slate-600 text-white resize-none"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm text-slate-300 mb-2 block">Priority</label>
+                      <Select value={newTask.priority} onValueChange={(value: 'low' | 'medium' | 'high') => setNewTask(prev => ({ ...prev, priority: value }))}>
+                        <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-slate-800 border-slate-700">
+                          <SelectItem value="low">Low</SelectItem>
+                          <SelectItem value="medium">Medium</SelectItem>
+                          <SelectItem value="high">High</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <label className="text-sm text-slate-300 mb-2 block">Estimated Time</label>
+                      <Input
+                        value={newTask.estimatedTime}
+                        onChange={(e) => setNewTask(prev => ({ ...prev, estimatedTime: e.target.value }))}
+                        placeholder="e.g., 2 hours"
+                        className="bg-slate-700/50 border-slate-600 text-white"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex gap-3 pt-4">
+                    <Button onClick={handleCreateTask} className="flex-1 bg-blue-600 hover:bg-blue-700">
+                      Create Task
+                    </Button>
+                    <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)} className="border-slate-600 text-slate-300">
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
           {selectedDateTasks.length === 0 ? (
             <div className="text-center py-8">
-              <Calendar className="h-12 w-12 text-slate-500 mx-auto mb-4" />
+              <CalendarIcon className="h-12 w-12 text-slate-500 mx-auto mb-4" />
               <p className="text-slate-400">No tasks scheduled for this date</p>
-              <Button variant="outline" size="sm" className="mt-2 bg-slate-700 border-slate-600 text-slate-300">
-                <Plus className="h-4 w-4 mr-1" />
-                Add Task
-              </Button>
+              <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="mt-2 bg-slate-700 border-slate-600 text-slate-300">
+                    <Plus className="h-4 w-4 mr-1" />
+                    Add Task
+                  </Button>
+                </DialogTrigger>
+              </Dialog>
             </div>
           ) : (
             selectedDateTasks.map((task, index) => (
@@ -157,6 +306,10 @@ const TaskCalendar = () => {
                     </Badge>
                   </div>
                   
+                  {task.description && (
+                    <p className="text-sm text-slate-300">{task.description}</p>
+                  )}
+                  
                   <div className="flex items-center gap-4 text-sm">
                     <div className="flex items-center gap-1 text-slate-400">
                       <Clock className="h-3 w-3" />
@@ -175,12 +328,16 @@ const TaskCalendar = () => {
                   </div>
 
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline" className="text-xs bg-slate-600/50 border-slate-500 text-slate-300">
-                      Edit
-                    </Button>
-                    <Button size="sm" variant="outline" className="text-xs bg-slate-600/50 border-slate-500 text-slate-300">
-                      Complete
-                    </Button>
+                    <Select value={task.status} onValueChange={(value: 'pending' | 'in-progress' | 'completed') => updateTaskStatus(task.id, value)}>
+                      <SelectTrigger className="text-xs bg-slate-600/50 border-slate-500 text-slate-300 h-8">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-slate-800 border-slate-700">
+                        <SelectItem value="pending">Pending</SelectItem>
+                        <SelectItem value="in-progress">In Progress</SelectItem>
+                        <SelectItem value="completed">Completed</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
                 {index < selectedDateTasks.length - 1 && <Separator className="bg-slate-700" />}
