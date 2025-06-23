@@ -13,16 +13,16 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      <div className="container mx-auto px-4 py-6">
+    <div className="min-h-screen bg-gray-950">
+      <div className="container mx-auto px-6 py-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2">TaskFlow AI</h1>
-            <p className="text-slate-400">Intelligent task management with AI-powered breakdown</p>
+            <h1 className="text-3xl font-bold text-gray-100 mb-2">TaskFlow AI</h1>
+            <p className="text-gray-400">Intelligent task management with AI-powered breakdown</p>
           </div>
           <div className="flex gap-3">
-            <Button variant="outline" className="bg-slate-800/50 border-slate-700 text-white hover:bg-slate-700">
+            <Button variant="outline" className="bg-gray-800 border-gray-700 text-gray-200 hover:bg-gray-700 hover:text-white">
               <Plus className="h-4 w-4 mr-2" />
               Quick Task
             </Button>
@@ -31,31 +31,31 @@ const Index = () => {
 
         {/* Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 bg-slate-800/50 border border-slate-700">
+          <TabsList className="grid w-full grid-cols-4 bg-gray-800 border border-gray-700">
             <TabsTrigger 
               value="dashboard" 
-              className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-slate-300"
+              className="data-[state=active]:bg-gray-700 data-[state=active]:text-gray-100 text-gray-400 hover:text-gray-200"
             >
               <BarChart3 className="h-4 w-4 mr-2" />
               Dashboard
             </TabsTrigger>
             <TabsTrigger 
               value="ai-breakdown" 
-              className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-slate-300"
+              className="data-[state=active]:bg-gray-700 data-[state=active]:text-gray-100 text-gray-400 hover:text-gray-200"
             >
               <Brain className="h-4 w-4 mr-2" />
               AI Breakdown
             </TabsTrigger>
             <TabsTrigger 
               value="calendar" 
-              className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-slate-300"
+              className="data-[state=active]:bg-gray-700 data-[state=active]:text-gray-100 text-gray-400 hover:text-gray-200"
             >
               <Calendar className="h-4 w-4 mr-2" />
               Calendar
             </TabsTrigger>
             <TabsTrigger 
               value="tasks" 
-              className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-slate-300"
+              className="data-[state=active]:bg-gray-700 data-[state=active]:text-gray-100 text-gray-400 hover:text-gray-200"
             >
               Tasks
             </TabsTrigger>
