@@ -6,67 +6,34 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-import { AuthProvider, useAuth } from "@/contexts/AuthContext";
-import { LandingPage } from "@/components/LandingPage";
-import { WorkspaceSelection } from "@/components/WorkspaceSelection";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
-
-function AppContent() {
-  const { isAuthenticated, showWorkspaceSelection, selectWorkspace, logout } = useAuth();
-
-  if (!isAuthenticated && !showWorkspaceSelection) {
-    return <LandingPage />;
-  }
-
-  if (showWorkspaceSelection) {
-    return (
-      <WorkspaceSelection
-        onWorkspaceSelected={selectWorkspace}
-        onBack={logout}
-      />
-    );
-  }
-
-  return (
-    <BrowserRouter>
-      <SidebarProvider>
-        <div className="min-h-screen flex w-full bg-gray-950">
-          <AppSidebar />
-          <main className="flex-1 flex flex-col">
-            <header className="h-12 flex items-center justify-between border-b border-gray-800 bg-gray-900">
-              <SidebarTrigger className="ml-4 text-gray-400 hover:text-white" />
-              <Button
-                onClick={logout}
-                variant="ghost"
-                className="mr-4 text-gray-400 hover:text-white"
-              >
-                Logout
-              </Button>
-            </header>
-            <div className="flex-1">
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </div>
-          </main>
-        </div>
-      </SidebarProvider>
-    </BrowserRouter>
-  );
-}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
+      <BrowserRouter>
+        <SidebarProvider>
+          <div className="min-h-screen flex w-full bg-gray-950">
+            <AppSidebar />
+            <main className="flex-1 flex flex-col">
+              <header className="h-12 flex items-center border-b border-gray-800 bg-gray-900">
+                <SidebarTrigger className="ml-4 text-gray-400 hover:text-white" />
+              </header>
+              <div className="flex-1">
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </div>
+            </main>
+          </div>
+        </SidebarProvider>
+      </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );
