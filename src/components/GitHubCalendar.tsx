@@ -1,6 +1,8 @@
 
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 
 const GitHubCalendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -8,11 +10,11 @@ const GitHubCalendar = () => {
   // Mock data for task completion - in a real app this would come from your task data
   const taskCompletionData = {
     '2024-12-01': { completed: 5, total: 5 }, // All tasks completed - green
-    '2024-12-02': { completed: 3, total: 4 }, // Some incomplete - grey
+    '2024-12-02': { completed: 3, total: 4 }, // Some incomplete - orange
     '2024-12-03': { completed: 2, total: 2 }, // All completed - green
-    '2024-12-15': { completed: 4, total: 6 }, // Some incomplete - grey
+    '2024-12-15': { completed: 4, total: 6 }, // Some incomplete - orange
     '2024-12-20': { completed: 1, total: 1 }, // All completed - green
-    '2024-12-24': { completed: 0, total: 3 }, // None completed - grey
+    '2024-12-24': { completed: 0, total: 3 }, // None completed - red
   };
 
   const getDaysInMonth = (date: Date) => {
@@ -48,19 +50,40 @@ const GitHubCalendar = () => {
     const dayData = taskCompletionData[dateKey];
     if (!dayData) return 'none';
     
-    return dayData.completed === dayData.total ? 'completed' : 'incomplete';
+    if (dayData.completed === dayData.total) return 'completed';
+    if (dayData.completed > 0) return 'partial';
+    return 'incomplete';
   };
 
   const getCellColor = (status: string | null) => {
     switch (status) {
       case 'completed':
-        return 'bg-green-600 border-green-500';
+        return 'bg-green-500 hover:bg-green-600 border-green-400';
+      case 'partial':
+        return 'bg-orange-500 hover:bg-orange-600 border-orange-400';
       case 'incomplete':
-        return 'bg-slate-600 border-slate-500';
+        return 'bg-red-500 hover:bg-red-600 border-red-400';
       case 'none':
       default:
-        return 'bg-slate-800 border-slate-700';
+        return 'bg-slate-700 hover:bg-slate-600 border-slate-600';
     }
+  };
+
+  const getTooltipText = (day: number | null, status: string | null) => {
+    if (!day) return '';
+    
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth() + 1;
+    const dateKey = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+    const dayData = taskCompletionData[dateKey];
+    
+    const dateText = `${monthNames[currentDate.getMonth()]} ${day}, ${year}`;
+    
+    if (!dayData) {
+      return `${dateText}\nNo tasks`;
+    }
+    
+    return `${dateText}\n${dayData.completed}/${dayData.total} tasks completed`;
   };
 
   const navigateMonth = (direction: 'prev' | 'next') => {
@@ -84,69 +107,85 @@ const GitHubCalendar = () => {
   const days = getDaysInMonth(currentDate);
 
   return (
-    <div className="space-y-4">
-      {/* Month Navigation */}
-      <div className="flex items-center justify-between">
-        <button
-          onClick={() => navigateMonth('prev')}
-          className="p-1 rounded hover:bg-slate-700 transition-colors"
-        >
-          <ChevronLeft className="h-4 w-4 text-slate-400" />
-        </button>
-        
-        <h3 className="text-white font-medium">
-          {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
-        </h3>
-        
-        <button
-          onClick={() => navigateMonth('next')}
-          className="p-1 rounded hover:bg-slate-700 transition-colors"
-        >
-          <ChevronRight className="h-4 w-4 text-slate-400" />
-        </button>
-      </div>
-
-      {/* Week Day Headers */}
-      <div className="grid grid-cols-7 gap-1 mb-2">
-        {weekDays.map((day, index) => (
-          <div key={index} className="text-xs text-slate-400 text-center font-medium">
-            {day}
-          </div>
-        ))}
-      </div>
-
-      {/* Calendar Grid */}
-      <div className="grid grid-cols-7 gap-1">
-        {days.map((day, index) => {
-          const status = getTaskStatus(day);
-          const cellColor = getCellColor(status);
+    <TooltipProvider>
+      <div className="space-y-3">
+        {/* Month Navigation */}
+        <div className="flex items-center justify-between">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigateMonth('prev')}
+            className="h-8 w-8 p-0 hover:bg-slate-700"
+          >
+            <ChevronLeft className="h-4 w-4 text-slate-400" />
+          </Button>
           
-          return (
-            <div
-              key={index}
-              className={`w-8 h-8 border rounded-sm flex items-center justify-center transition-colors ${cellColor}`}
-            >
-              {day && (
-                <span className="text-xs text-white font-medium">
-                  {day}
-                </span>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Legend */}
-      <div className="flex items-center gap-3 text-xs text-slate-400 mt-4">
-        <span>Less</span>
-        <div className="flex gap-1">
-          <div className="w-3 h-3 bg-slate-800 border border-slate-700 rounded-sm"></div>
-          <div className="w-3 h-3 bg-slate-600 border border-slate-500 rounded-sm"></div>
-          <div className="w-3 h-3 bg-green-600 border border-green-500 rounded-sm"></div>
+          <h3 className="text-white font-medium text-sm">
+            {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
+          </h3>
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigateMonth('next')}
+            className="h-8 w-8 p-0 hover:bg-slate-700"
+          >
+            <ChevronRight className="h-4 w-4 text-slate-400" />
+          </Button>
         </div>
-        <span>More</span>
+
+        {/* Week Day Headers */}
+        <div className="grid grid-cols-7 gap-1 mb-1">
+          {weekDays.map((day, index) => (
+            <div key={index} className="text-xs text-slate-400 text-center font-medium h-6 flex items-center justify-center">
+              {day}
+            </div>
+          ))}
+        </div>
+
+        {/* Calendar Grid */}
+        <div className="grid grid-cols-7 gap-1">
+          {days.map((day, index) => {
+            const status = getTaskStatus(day);
+            const cellColor = getCellColor(status);
+            const tooltipText = getTooltipText(day, status);
+            
+            return (
+              <Tooltip key={index}>
+                <TooltipTrigger asChild>
+                  <div
+                    className={`w-6 h-6 border rounded-sm transition-all duration-200 cursor-pointer ${cellColor} ${
+                      day ? 'hover:scale-110' : 'cursor-default hover:scale-100'
+                    }`}
+                  >
+                  </div>
+                </TooltipTrigger>
+                {day && (
+                  <TooltipContent 
+                    side="top" 
+                    className="bg-slate-900 border-slate-700 text-white text-xs whitespace-pre-line"
+                  >
+                    {tooltipText}
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            );
+          })}
+        </div>
+
+        {/* Legend */}
+        <div className="flex items-center gap-2 text-xs text-slate-400 mt-3">
+          <span>Less</span>
+          <div className="flex gap-1">
+            <div className="w-3 h-3 bg-slate-700 border border-slate-600 rounded-sm"></div>
+            <div className="w-3 h-3 bg-red-500 border border-red-400 rounded-sm"></div>
+            <div className="w-3 h-3 bg-orange-500 border border-orange-400 rounded-sm"></div>
+            <div className="w-3 h-3 bg-green-500 border border-green-400 rounded-sm"></div>
+          </div>
+          <span>More</span>
+        </div>
       </div>
-    </div>
+    </TooltipProvider>
   );
 };
 
