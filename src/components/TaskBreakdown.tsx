@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Brain, Sparkles, CheckCircle2, Circle, Calendar, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import DiceRoller from '@/components/DiceRoller';
 
 interface Step {
   id: string;
@@ -105,6 +106,23 @@ const TaskBreakdown = () => {
     });
   };
 
+  const handleStepSelected = (step: Step) => {
+    toast({
+      title: "Task selected by dice!",
+      description: `Focus on: "${step.title}"`
+    });
+    
+    // Scroll to the selected step
+    const stepElement = document.getElementById(`step-${step.id}`);
+    if (stepElement) {
+      stepElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      stepElement.classList.add('ring-2', 'ring-purple-400', 'ring-opacity-50');
+      setTimeout(() => {
+        stepElement.classList.remove('ring-2', 'ring-purple-400', 'ring-opacity-50');
+      }, 3000);
+    }
+  };
+
   const completedCount = steps.filter(step => step.completed).length;
   const progress = steps.length > 0 ? (completedCount / steps.length) * 100 : 0;
 
@@ -151,6 +169,18 @@ const TaskBreakdown = () => {
         </CardContent>
       </Card>
 
+      {/* Dice Roller Section */}
+      {steps.length > 0 && (
+        <Card className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 border-purple-700/50 backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle className="text-white text-center">🎲 Random Task Picker</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <DiceRoller steps={steps} onStepSelected={handleStepSelected} />
+          </CardContent>
+        </Card>
+      )}
+
       {/* Generated Steps */}
       {steps.length > 0 && (
         <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
@@ -173,7 +203,10 @@ const TaskBreakdown = () => {
           <CardContent className="space-y-4">
             {steps.map((step, index) => (
               <div key={step.id}>
-                <div className="flex items-start gap-4 p-4 rounded-lg bg-slate-700/30 hover:bg-slate-700/50 transition-colors">
+                <div 
+                  id={`step-${step.id}`}
+                  className="flex items-start gap-4 p-4 rounded-lg bg-slate-700/30 hover:bg-slate-700/50 transition-all duration-300"
+                >
                   <button
                     onClick={() => toggleStep(step.id)}
                     className="mt-1 text-slate-400 hover:text-white transition-colors"
@@ -250,6 +283,7 @@ const TaskBreakdown = () => {
                 <li>• Be specific about your task requirements for better breakdown</li>
                 <li>• Include context about deadlines and constraints</li>
                 <li>• Mention any specific tools or technologies you need to use</li>
+                <li>• Use the dice roller to randomly pick your next task!</li>
               </ul>
             </div>
           </div>
