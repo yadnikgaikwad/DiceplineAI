@@ -24,13 +24,12 @@ const DiceRoller = ({ steps, onStepSelected }: DiceRollerProps) => {
   const [showResult, setShowResult] = useState(false);
   const [diceResults, setDiceResults] = useState<number[]>([]);
   const [selectedStep, setSelectedStep] = useState<Step | null>(null);
-  const [timerProgress, setTimerProgress] = useState(0);
   const { toast } = useToast();
 
   const getDiceIcon = (value: number) => {
     const icons = [Dice1, Dice2, Dice3, Dice4, Dice5, Dice6];
     const IconComponent = icons[value - 1];
-    return <IconComponent className="w-12 h-12 text-purple-400" />;
+    return <IconComponent className="w-12 h-12 text-gray-800" />;
   };
 
   const rollDice = async () => {
@@ -44,7 +43,6 @@ const DiceRoller = ({ steps, onStepSelected }: DiceRollerProps) => {
     }
 
     setIsRolling(true);
-    setTimerProgress(0);
     
     // Simulate dice rolling animation
     await new Promise(resolve => setTimeout(resolve, 1500));
@@ -71,19 +69,24 @@ const DiceRoller = ({ steps, onStepSelected }: DiceRollerProps) => {
     setSelectedStep(step);
     setIsRolling(false);
     setShowResult(true);
-    
-    // Start timer animation
-    const timer = setInterval(() => {
-      setTimerProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(timer);
-          setShowResult(false);
-          onStepSelected(step);
-          return 0;
-        }
-        return prev + 2;
+  };
+
+  const handleAddToTask = () => {
+    if (selectedStep) {
+      setShowResult(false);
+      onStepSelected(selectedStep);
+      toast({
+        title: "Task selected!",
+        description: `Focus on: "${selectedStep.title}"`
       });
-    }, 60); // 3 second timer (100/2 * 60ms = 3000ms)
+    }
+  };
+
+  const handleRollAgain = () => {
+    setShowResult(false);
+    setDiceResults([]);
+    setSelectedStep(null);
+    rollDice();
   };
 
   const numDice = steps.length > 6 ? 2 : 1;
@@ -97,17 +100,17 @@ const DiceRoller = ({ steps, onStepSelected }: DiceRollerProps) => {
             <div 
               key={index}
               className={`
-                w-16 h-16 bg-slate-700/50 border-2 border-slate-600 rounded-lg 
-                flex items-center justify-center transition-all duration-300
+                w-16 h-16 bg-white border-2 border-gray-800 rounded-lg 
+                flex items-center justify-center transition-all duration-300 shadow-lg
                 ${isRolling ? 'animate-bounce' : ''}
               `}
             >
               {isRolling ? (
-                <div className="w-3 h-3 bg-purple-400 rounded-full animate-pulse" />
+                <div className="w-3 h-3 bg-gray-800 rounded-full animate-pulse" />
               ) : diceResults[index] ? (
                 getDiceIcon(diceResults[index])
               ) : (
-                <div className="w-8 h-8 border-2 border-slate-500 rounded border-dashed" />
+                <div className="w-8 h-8 border-2 border-gray-400 rounded border-dashed" />
               )}
             </div>
           ))}
@@ -117,13 +120,13 @@ const DiceRoller = ({ steps, onStepSelected }: DiceRollerProps) => {
         <Button
           onClick={rollDice}
           disabled={isRolling || steps.length === 0}
-          className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-2"
+          className="bg-gray-900 hover:bg-gray-800 text-white border border-gray-700 px-6 py-2"
         >
           {isRolling ? 'Rolling...' : 'Roll Dice'}
         </Button>
       </div>
       
-      <p className="text-center text-sm text-slate-400">
+      <p className="text-center text-sm text-gray-600">
         {steps.length === 0 
           ? "Generate tasks to use the dice roller"
           : `${numDice} dice for ${steps.length} tasks`
@@ -132,16 +135,16 @@ const DiceRoller = ({ steps, onStepSelected }: DiceRollerProps) => {
 
       {/* Result Dialog */}
       <Dialog open={showResult} onOpenChange={setShowResult}>
-        <DialogContent className="bg-slate-800 border-slate-700 max-w-md">
+        <DialogContent className="bg-white border-2 border-gray-800 max-w-md shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="text-white text-center">Task Selected!</DialogTitle>
+            <DialogTitle className="text-gray-900 text-center font-bold">Task Selected!</DialogTitle>
           </DialogHeader>
           
           <div className="space-y-6 py-4">
             {/* Dice Result */}
             <div className="flex justify-center gap-3">
               {diceResults.map((result, index) => (
-                <div key={index} className="w-16 h-16 bg-slate-700 border-2 border-purple-400 rounded-lg flex items-center justify-center">
+                <div key={index} className="w-16 h-16 bg-white border-2 border-gray-800 rounded-lg flex items-center justify-center shadow-lg">
                   {getDiceIcon(result)}
                 </div>
               ))}
@@ -149,26 +152,30 @@ const DiceRoller = ({ steps, onStepSelected }: DiceRollerProps) => {
             
             {/* Selected Task */}
             {selectedStep && (
-              <div className="text-center space-y-2">
-                <h3 className="text-white font-medium">{selectedStep.title}</h3>
-                <p className="text-slate-300 text-sm">{selectedStep.description}</p>
-                <div className="text-xs text-slate-400">
+              <div className="text-center space-y-2 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                <h3 className="text-gray-900 font-semibold text-lg">{selectedStep.title}</h3>
+                <p className="text-gray-700 text-sm">{selectedStep.description}</p>
+                <div className="text-xs text-gray-600 font-medium">
                   Estimated time: {selectedStep.estimatedTime}
                 </div>
               </div>
             )}
             
-            {/* Timer Progress */}
-            <div className="space-y-2">
-              <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-75 ease-linear"
-                  style={{ width: `${timerProgress}%` }}
-                />
-              </div>
-              <p className="text-center text-xs text-slate-400">
-                Auto-selecting in {Math.ceil((100 - timerProgress) * 0.03)} seconds
-              </p>
+            {/* Action Buttons */}
+            <div className="flex gap-3 justify-center">
+              <Button 
+                onClick={handleAddToTask}
+                className="bg-gray-900 hover:bg-gray-800 text-white border border-gray-700 px-6"
+              >
+                Add to Task
+              </Button>
+              <Button 
+                onClick={handleRollAgain}
+                variant="outline"
+                className="border-gray-800 text-gray-900 hover:bg-gray-100 px-6"
+              >
+                Roll Again
+              </Button>
             </div>
           </div>
         </DialogContent>

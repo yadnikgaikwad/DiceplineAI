@@ -171,9 +171,9 @@ const TaskBreakdown = () => {
 
       {/* Dice Roller Section */}
       {steps.length > 0 && (
-        <Card className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 border-purple-700/50 backdrop-blur-sm">
+        <Card className="bg-white border-2 border-gray-800 backdrop-blur-sm shadow-lg">
           <CardHeader>
-            <CardTitle className="text-white text-center">🎲 Random Task Picker</CardTitle>
+            <CardTitle className="text-gray-900 text-center font-bold">🎲 Random Task Picker</CardTitle>
           </CardHeader>
           <CardContent>
             <DiceRoller steps={steps} onStepSelected={handleStepSelected} />
