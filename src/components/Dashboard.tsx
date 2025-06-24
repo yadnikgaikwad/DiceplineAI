@@ -1,8 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, CheckCircle2, Clock, TrendingUp, Target, Zap } from 'lucide-react';
+import { Calendar, CheckCircle2, Clock, TrendingUp, Target } from 'lucide-react';
 import AnimatedTimeDisplay from './AnimatedTimeDisplay';
+import GitHubCalendar from './GitHubCalendar';
 
 const Dashboard = () => {
   // Mock data for demonstration
@@ -130,53 +131,16 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Recent Tasks */}
+        {/* Task Completion Calendar */}
         <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm lg:col-span-3">
           <CardHeader>
             <CardTitle className="text-white flex items-center gap-2">
-              <Zap className="h-5 w-5 text-yellow-400" />
-              Recent Activity
+              <Calendar className="h-5 w-5 text-green-400" />
+              Task Completion Calendar
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              {recentTasks.map((task, index) => (
-                <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-slate-700/30 hover:bg-slate-700/50 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-2 h-2 rounded-full ${
-                      task.status === 'completed' ? 'bg-green-400' :
-                      task.status === 'in-progress' ? 'bg-orange-400' : 'bg-slate-400'
-                    }`} />
-                    <div>
-                      <p className="text-white font-medium">{task.name}</p>
-                      <p className="text-xs text-slate-400">Due: {task.dueDate}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge 
-                      variant="outline"
-                      className={`text-xs ${
-                        task.priority === 'high' ? 'border-red-400/50 text-red-400' :
-                        task.priority === 'medium' ? 'border-orange-400/50 text-orange-400' :
-                        'border-slate-400/50 text-slate-400'
-                      }`}
-                    >
-                      {task.priority}
-                    </Badge>
-                    <Badge 
-                      variant="outline"
-                      className={`text-xs ${
-                        task.status === 'completed' ? 'border-green-400/50 text-green-400' :
-                        task.status === 'in-progress' ? 'border-orange-400/50 text-orange-400' :
-                        'border-slate-400/50 text-slate-400'
-                      }`}
-                    >
-                      {task.status}
-                    </Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <GitHubCalendar />
           </CardContent>
         </Card>
       </div>
