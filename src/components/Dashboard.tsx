@@ -1,9 +1,13 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, CheckCircle2, Clock, TrendingUp, Target } from 'lucide-react';
 import AnimatedTimeDisplay from './AnimatedTimeDisplay';
 import GitHubCalendar from './GitHubCalendar';
+import HumidityChart from './HumidityChart';
+import EnergyChart from './EnergyChart';
+import ProjectMetrics from './ProjectMetrics';
 
 const Dashboard = () => {
   // Mock data for demonstration
@@ -130,6 +134,16 @@ const Dashboard = () => {
             ))}
           </CardContent>
         </Card>
+
+        {/* Analytics Charts Section */}
+        <div className="lg:col-span-3">
+          <h3 className="text-white text-lg font-semibold mb-4">Analytics Overview</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <HumidityChart />
+            <EnergyChart />
+            <ProjectMetrics />
+          </div>
+        </div>
 
         {/* Task Completion Calendar */}
         <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm lg:col-span-3">
