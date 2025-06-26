@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, CheckCircle2, Clock, TrendingUp, Target } from 'lucide-react';
-import AnimatedTimeDisplay from './AnimatedTimeDisplay';
+import CircularTimeWidget from './CircularTimeWidget';
 import GitHubCalendar from './GitHubCalendar';
 
 const Dashboard = () => {
@@ -31,7 +31,10 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6">
-      <AnimatedTimeDisplay />
+      {/* Circular Time Widget */}
+      <div className="flex justify-center">
+        <CircularTimeWidget />
+      </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Overview Stats */}

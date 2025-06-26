@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { AuthProvider } from "@/contexts/AuthContext";
+import NavbarDots from "@/components/NavbarDots";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
@@ -23,8 +24,9 @@ const App = () => (
             <div className="min-h-screen flex w-full bg-gray-950">
               <AppSidebar />
               <main className="flex-1 flex flex-col">
-                <header className="h-12 flex items-center border-b border-gray-800 bg-gray-900">
-                  <SidebarTrigger className="ml-4 text-gray-400 hover:text-white" />
+                <header className="h-12 flex items-center justify-between border-b border-gray-800 bg-gray-900 px-4">
+                  <SidebarTrigger className="text-gray-400 hover:text-white" />
+                  <NavbarDots />
                 </header>
                 <div className="flex-1">
                   <Routes>
