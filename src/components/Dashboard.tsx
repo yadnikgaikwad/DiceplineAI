@@ -38,40 +38,6 @@ const Dashboard = () => {
       <AnimatedTimeDisplay />
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Overview Stats */}
-        <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-slate-300">Total Tasks</CardTitle>
-            <Target className="h-4 w-4 text-blue-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">{stats.totalTasks}</div>
-            <p className="text-xs text-slate-400">+2 from last week</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-slate-300">Completed</CardTitle>
-            <CheckCircle2 className="h-4 w-4 text-green-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">{stats.completedTasks}</div>
-            <p className="text-xs text-slate-400">75% completion rate</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-slate-300">Today's Tasks</CardTitle>
-            <Clock className="h-4 w-4 text-orange-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">{stats.todayTasks}</div>
-            <p className="text-xs text-slate-400">3 remaining</p>
-          </CardContent>
-        </Card>
-
         {/* Progress Overview */}
         <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm lg:col-span-2">
           <CardHeader>
@@ -81,6 +47,13 @@ const Dashboard = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Target className="h-4 w-4 text-blue-400" />
+                <span className="text-sm text-slate-300">Total Tasks</span>
+              </div>
+              <span className="text-lg font-bold text-white">{stats.totalTasks}</span>
+            </div>
             <div>
               <div className="flex justify-between text-sm mb-2">
                 <span className="text-slate-300">Overall Completion</span>
